@@ -24,6 +24,13 @@ class Plane():
         return '' + str(self.a) + 'x + ' + str(self.b) + 'y + ' + str(self.c) + 'z + ' + str(self.d) + ' = 0'  
 
 
+    def intersect(self, vNormal, p1):
+        
+        t = (self.d + (self.a * p1.x) + (self.b * p1.y) + (self.c * p1.z)) / ((self.a*vNormal.a1) + (self.b*vNormal.a2) + (self.c*vNormal.a3));
+         
+        return Point(p1.x-(vNormal.a1 *t), p1.yx-(vNormal.a2 *t), p1.z-(vNormal.a3 *t))
+
+        
 class Point():
     x = 0.0
     y = 0.0
@@ -37,6 +44,22 @@ class Point():
     def __str__(self):
         return '(' + str(self.x) + ',' + str(self.y) + ',' + str(self.z) + ')'
 
+
+    def dihedral(self, p2, p3, p4):
+    
+        midP = p2.mid(p3)
+        normalV = p2.vector(p3)
+        aPlane = midP.plane(p2, p3)
+        
+        # zeroV = 
+        
+
+
+    def distance(self, p2):
+    
+        return math.sqrt( math.sqr(p2.x - self.x) + math.sqr(p2.y - self.y) + math.sqr(p2.z - self.z))
+    
+    
     def mid(self, endPoint):
         midPoint = Point(0.0, 0.0, 0.0)
         
@@ -62,6 +85,7 @@ class Point():
         return Plane(cp.a1, cp.a2, cp.a3, cp.a1 * (-1 * self.x) + cp.a2 * (-1 * self.y) + cp.a3 * (-1.0 * self.z))        
     
     
+         
     
     def vector(self, endPoint):
         v1 = Vector(0.0, 0.0, 0.0)
@@ -92,15 +116,48 @@ class Vector():
         return '<%7.3f, %7.3f, %7.3f>' % (self.a1,self.a2,self.a3)
 
 
+    def angle(self, v2):
+    
+        aDotb = self.dot(v2)
+        absA  = self.mag()
+        absB = v2.mag()
+        
+        cosine = aDotb / (absA * absB)
+        
+        if cosine == 0.0 :
+            return math.pi / 2.0
+        else:
+            if cosine == 1.0:
+                return 0.0
+            else:
+                if cosine < 0.0:
+                    sine = math.sqrt(1.0 - (cosine * cosine))
+                    return math.pi - math.fabs(math.atan(sine/cosine))
+                else:
+                    sine = math.sqrt(1.0 - (cosine * cosine))
+                    return math.atan(sine/cosine)
+                    
+                        
     def crossP(self, v2):
         
         return Vector( self.a2*v2.a3 - self.a3*v2.a2, self.a3*v2.a1 - self.a1 * v2.a3, self.a1 *v2.a2- self.a2 * v2.a1)      
         
-
+        
+    def dot(self, v2):
+    
+        return self.a1 * v2.a1 + self.a2 * v2.a2 + self.a3 * v2.a3
+    
+    
     def mag(self):
         
         return math.sqrt((self.a1*self.a1) + (self.a2 * self.a2) + (self.a3 * self.a3))
         
+
+    def plane(self, p1):
+    
+        d = (self.a1 * (-1 * p1.x)) + (self.a2 * (-1 * p1.y)) + (self.a3 * (-1 * p1.z)) 
+        return Plane(self.a1, self.a2, self.a3, d)
+
 
     def sum(self, bVector):
 
@@ -144,4 +201,21 @@ p3 = Point(0, -1, 2)
 
 print('Plane: ' + str(p1.plane(p2, p3)))
     
+     
+# Vector angle Tests
+
+xAxis = Vector(1, 0, 0)
+v5 = Vector(1,1,0)
+print(xAxis.angle(v5))
+
+v6 = Vector(0,1,0)
+print(xAxis.angle(v6))
+
+v7 = Vector(-1,1,0)
+print(xAxis.angle(v7))
+
+v8 = Vector(-1,0,0)
+print(xAxis.angle(v8))
+   
+     
      
